@@ -1,0 +1,66 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+local speedEnabled = false
+local speedValue = 70
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "TERzHUB"
+ScreenGui.Parent = game.CoreGui
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 220, 0, 140)
+Frame.Position = UDim2.new(0.05, 0, 0.2, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+Frame.Active = true
+Frame.Draggable = true
+Frame.Parent = ScreenGui
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+Title.Text = "TERz HUB - Speed"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Parent = Frame
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(1, -20, 0, 30)
+ToggleButton.Position = UDim2.new(0, 10, 0, 40)
+ToggleButton.Text = "ปิด/เปิด Speed"
+ToggleButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Parent = Frame
+
+local SpeedBox = Instance.new("TextBox")
+SpeedBox.Size = UDim2.new(1, -20, 0, 30)
+SpeedBox.Position = UDim2.new(0, 10, 0, 80)
+SpeedBox.Text = tostring(speedValue)
+SpeedBox.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+SpeedBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedBox.ClearTextOnFocus = false
+SpeedBox.Parent = Frame
+
+ToggleButton.MouseButton1Click:Connect(function()
+    speedEnabled = not speedEnabled
+    ToggleButton.Text = speedEnabled and "Speed: ON" or "Speed: OFF"
+end)
+
+SpeedBox.FocusLost:Connect(function()
+    local newSpeed = tonumber(SpeedBox.Text)
+    if newSpeed and newSpeed > 0 then
+        speedValue = newSpeed
+    else
+        SpeedBox.Text = tostring(speedValue)
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if speedEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local HRP = player.Character.HumanoidRootPart
+        local moveDir = player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.MoveDirection or Vector3.new()
+        if moveDir.Magnitude > 0 then
+            HRP.Velocity = moveDir * speedValue + Vector3.new(0, HRP.Velocity.Y, 0)
+        end
+    end
+end)
